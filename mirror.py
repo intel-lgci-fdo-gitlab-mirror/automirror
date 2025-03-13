@@ -94,6 +94,8 @@ def sync_repos(job: MirrorJob, cleanup: bool = True):
         run(["git", "clone", "--no-checkout", job.to_repo, job.name], timeout=1800, **xtras)
         run(["git", *target_dir, "switch", "-c", job.to_branch], timeout=60, **xtras)
 
+    run(["git", *target_dir, "config", "http.postBuffer", "157286400"], timeout=30, **xtras)
+
     # Set up and download missing objects from the source server:
     logging.info("Downloading the source branch from %s -> %s...", job.from_repo, job.from_branch)
     run(["git", *target_dir, "remote", "add", "mirrorsrc", job.from_repo], timeout=30, **xtras)
