@@ -5,7 +5,7 @@ import tomllib
 from shutil import rmtree
 from functools import cache
 from dataclasses import dataclass
-from subprocess import run, CalledProcessError
+from subprocess import run, CalledProcessError, STDOUT
 
 
 logging.getLogger().setLevel(logging.INFO)
@@ -61,7 +61,7 @@ def should_sync_job(job: MirrorJob) -> bool:
     from_hash = from_heads.get(job.from_branch)
     to_hash = to_heads.get(job.to_branch)
     logging.info(
-        "Comparing: %s:%s @ %s vs %s:%s @ %s",
+        "Comparing: %s -> %s @ %s vs %s -> %s @ %s",
         job.from_repo, job.from_branch, from_hash,
         job.to_repo, job.to_branch, to_hash
     )
@@ -78,27 +78,31 @@ def should_sync_job(job: MirrorJob) -> bool:
 
 
 def sync_repos(job: MirrorJob, cleanup: bool = True):
-    target_dir = ("-C", job.name)
     heads = get_remote_heads(job.to_repo)
     if heads is None:
         raise ValueError("wat")
 
+    target_dir = ("-C", job.name)
+    xtras = {"check": True, "stderr": STDOUT}
+
     if job.to_branch in heads:
         # Clone the target repository first to minimize load on the source server:
-        run(["git", "clone", "--no-checkout", "--branch", job.to_branch, job.to_repo, job.name], timeout=1800, check=True)
+        run(["git", "clone", "--no-checkout", "--branch", job.to_branch, job.to_repo, job.name], timeout=1800, **xtras)
     else:
         # Clone the target repo first, but create the new branch manually:
-        logging.info("Target branch %s not found in repo %s, initializing", job.to_branch, job.to_repo)
-        run(["git", "clone", "--no-checkout", job.to_repo, job.name], timeout=1800, check=True)
-        run(["git", *target_dir, "switch", "-c", job.to_branch])
+        logging.info("Target branch %s not found in repo %s - initializing", job.to_branch, job.to_repo)
+        run(["git", "clone", "--no-checkout", job.to_repo, job.name], timeout=1800, **xtras)
+        run(["git", *target_dir, "switch", "-c", job.to_branch], timeout=60, **xtras)
 
     # Set up and download missing objects from the source server:
-    run(["git", *target_dir, "remote", "add", "mirrorsrc", job.from_repo], timeout=30, check=True)
-    run(["git", *target_dir, "fetch", "mirrorsrc", job.from_branch], timeout=1800, check=True)
+    logging.info("Downloading the source branch from %s -> %s...", job.from_repo, job.from_branch)
+    run(["git", *target_dir, "remote", "add", "mirrorsrc", job.from_repo], timeout=30, **xtras)
+    run(["git", *target_dir, "fetch", "mirrorsrc", job.from_branch], timeout=1800, **xtras)
 
     # Make the target branch point to the mirrored object and force push it:
-    run(["git", *target_dir, "branch", "-f", job.to_branch, f"mirrorsrc/{job.from_branch}"])
-    run(["git", *target_dir, "push", "--set-upstream", "--force", "origin", job.to_branch], timeout=1800, check=True)
+    logging.info("Pushing to the target branch to %s -> %s...", job.to_repo, job.to_branch)
+    run(["git", *target_dir, "branch", "-f", job.to_branch, f"mirrorsrc/{job.from_branch}"], timeout=60, **xtras)
+    run(["git", *target_dir, "push", "--set-upstream", "--force", "origin", job.to_branch], timeout=1800, **xtras)
 
     # Clean up after the mirror:
     if cleanup:
