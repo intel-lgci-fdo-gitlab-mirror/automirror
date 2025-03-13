@@ -1,0 +1,15 @@
+# Each [mirror.name] block will be a separate mirror job.
+# The source and target branch names do not have to match.
+# Make sure mirror job names are kebab-cased please.
+
+[mirror.drm-xe-ci]
+from-repo = "https://gitlab.freedesktop.org/drm/xe/ci"
+from-branch = "main"
+to-repo = "https://github.com/intel-lgci-fdo-gitlab-mirror/drm.xe.ci"
+to-branch = "main"
+
+[mirror.drm-xe-kernel]
+from-repo = "https://gitlab.freedesktop.org/drm/xe/kernel"
+from-branch = "drm-xe-next"
+to-repo = "https://github.com/intel-lgci-fdo-gitlab-mirror/drm.xe.kernel"
+to-branch = "drm-xe-next"
