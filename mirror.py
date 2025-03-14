@@ -1,10 +1,14 @@
 import sys
+import uuid
+import string
 import logging
 import tomllib
 
 from shutil import rmtree
 from functools import cache
+from itertools import groupby
 from dataclasses import dataclass
+from urllib.parse import urlparse
 from subprocess import run, CalledProcessError, STDOUT
 
 
@@ -77,56 +81,67 @@ def should_sync_job(job: MirrorJob) -> bool:
     return True
 
 
-def sync_repos(job: MirrorJob, cleanup: bool = True):
+def sync_repos(job: MirrorJob, repo_dir: str):
+    logging.info("[+] Processing job: %s", job.name)
+
     heads = get_remote_heads(job.to_repo)
     if heads is None:
         raise ValueError("wat")
 
-    target_dir = ("-C", job.name)
+    git_cmd = ("git", "-C", repo_dir)
     xtras = {"check": True, "stderr": STDOUT}
-
-    if job.to_branch in heads:
-        # Clone the target repository first to minimize load on the source server:
-        run(["git", "clone", "--no-checkout", "--branch", job.to_branch, job.to_repo, job.name], timeout=1800, **xtras)
-    else:
-        # Clone the target repo first, but create the new branch manually:
-        logging.info("Target branch %s not found in repo %s - initializing", job.to_branch, job.to_repo)
-        run(["git", "clone", "--no-checkout", job.to_repo, job.name], timeout=1800, **xtras)
-        run(["git", *target_dir, "switch", "-c", job.to_branch], timeout=60, **xtras)
-
-    run(["git", *target_dir, "config", "http.postBuffer", "157286400"], timeout=30, **xtras)
 
     # Set up and download missing objects from the source server:
     logging.info("Downloading the source branch from %s -> %s...", job.from_repo, job.from_branch)
-    run(["git", *target_dir, "remote", "add", "mirrorsrc", job.from_repo], timeout=30, **xtras)
-    run(["git", *target_dir, "fetch", "mirrorsrc", job.from_branch], timeout=1800, **xtras)
+    run([*git_cmd, "remote", "add", job.name, job.from_repo], timeout=30, **xtras)
+    run([*git_cmd, "fetch", job.name, job.from_branch], timeout=1800, **xtras)
 
     # Make the target branch point to the mirrored object and force push it:
     logging.info("Pushing to the target branch to %s -> %s...", job.to_repo, job.to_branch)
-    run(["git", *target_dir, "branch", "-f", job.to_branch, f"mirrorsrc/{job.from_branch}"], timeout=60, **xtras)
-    run(["git", *target_dir, "push", "--set-upstream", "--force", "origin", job.to_branch], timeout=1800, **xtras)
+    run([*git_cmd, "push", "--force", "origin", f"refs/remotes/{job.name}/{job.from_branch}:refs/heads/{job.to_branch}"], timeout=1800, **xtras)
 
-    # Clean up after the mirror:
-    if cleanup:
-        rmtree(job.name)
+
+def generate_repo_path(url: str) -> str:
+    path = urlparse(url).path.strip().strip('/').lower()
+    safe_chars = [ch for ch in path if ch in string.ascii_lowercase + string.digits]
+    return "".join(safe_chars) + "-" + str(uuid.uuid4())
 
 
 def main():
-    whoopsie = False
-    jobs = load_config()
+    global_failure = False
+    by_repo_url = lambda x: x.to_repo
+    jobs = [job for job in load_config().values() if should_sync_job(job)]
 
-    for name, job in jobs.items():
-        logging.info("[+] Processing job: %s", job.name)
-        if not should_sync_job(job):
-            continue
+    logging.info("Will sync %d job(s): %s", len(jobs), ", ".join(j.name for j in jobs))
 
-        try:
-            sync_repos(job)
-        except:
-            logging.exception("Failed to process job: %s", job.name)
-            whoopsie = True
+    # Group jobs by the target repo to clone the target repo only once.
+    for repo_url, jobs in groupby(sorted(jobs, key=by_repo_url), key=by_repo_url):
+        logging.info("[+] Processing jobs for repo: %s", repo_url)
+        repo_path = generate_repo_path(repo_url)
+        group_failure = False
 
-    return 1 if whoopsie else 0
+        # Clone the target repository first to minimize load on the source server:
+        logging.info("Cloning and configuring target repo %s to %s...", repo_url, repo_path)
+        run(["git", "clone", "--no-checkout", repo_url, repo_path], timeout=1800, check=True)
+        run(["git", "-C", repo_path, "config", "http.postBuffer", "157286400"], timeout=30, check=True)
+
+        for job in jobs:
+            try:
+                sync_repos(job, repo_path)
+            except:
+                logging.exception("Failed to process job: %s", job.name)
+                global_failure = True
+                group_failure = True
+
+        if not group_failure:
+            # Leave the dir for debugging purposes:
+            try:
+                rmtree(repo_path)
+            except:
+                logging.exception("Could not clean up the job repo: %s", repo_path)
+                # Don't set failures here, if the sync was successful, it's all good!
+
+    return 1 if global_failure else 0
 
 
 if __name__ == "__main__":
