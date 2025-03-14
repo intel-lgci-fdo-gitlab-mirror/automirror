@@ -2,6 +2,39 @@
 # The source and target branch names do not have to match.
 # Make sure mirror job names are kebab-cased please.
 
+
+# IGT, MT, etc
+
+[mirror.drm-maintainer-tools]
+from-repo = "https://gitlab.freedesktop.org/drm/maintainer-tools"
+from-branch = "master"
+to-repo = "https://github.com/intel-lgci-fdo-gitlab-mirror/drm.maintainer-tools"
+to-branch = "master"
+
+[mirror.drm-igt-gpu-tools]
+from-repo = "https://gitlab.freedesktop.org/drm/igt-gpu-tools"
+from-branch = "master"
+to-repo = "https://github.com/intel-lgci-fdo-gitlab-mirror/drm.igt-gpu-tools"
+to-branch = "master"
+
+[mirror.gfx-ci-i915-infra]
+from-repo = "https://gitlab.freedesktop.org/gfx-ci/i915-infra"
+from-branch = "master"
+to-repo = "https://github.com/intel-lgci-fdo-gitlab-mirror/gfx-ci.i915-infra"
+to-branch = "master"
+
+
+# Tip
+
+[mirror.drm-tip]
+from-repo = "https://gitlab.freedesktop.org/drm/tip"
+from-branch = "drm-tip"
+to-repo = "https://github.com/intel-lgci-fdo-gitlab-mirror/drm.tip"
+to-branch = "drm-tip"
+
+
+# Xe
+
 [mirror.drm-xe-ci]
 from-repo = "https://gitlab.freedesktop.org/drm/xe/ci"
 from-branch = "main"
@@ -13,3 +46,75 @@ from-repo = "https://gitlab.freedesktop.org/drm/xe/kernel"
 from-branch = "drm-xe-next"
 to-repo = "https://github.com/intel-lgci-fdo-gitlab-mirror/drm.xe.kernel"
 to-branch = "drm-xe-next"
+
+
+# i915
+
+[mirror.drm-i915-kernel-drm-intel-fixes]
+from-repo = "https://gitlab.freedesktop.org/drm/i915/kernel"
+from-branch = "drm-intel-fixes"
+to-repo = "https://github.com/intel-lgci-fdo-gitlab-mirror/drm.i915.kernel"
+to-branch = "drm-intel-fixes"
+
+[mirror.drm-i915-kernel-drm-intel-next]
+from-repo = "https://gitlab.freedesktop.org/drm/i915/kernel"
+from-branch = "drm-intel-next"
+to-repo = "https://github.com/intel-lgci-fdo-gitlab-mirror/drm.i915.kernel"
+to-branch = "drm-intel-next"
+
+[mirror.drm-i915-kernel-drm-intel-next-fixes]
+from-repo = "https://gitlab.freedesktop.org/drm/i915/kernel"
+from-branch = "drm-intel-next-fixes"
+to-repo = "https://github.com/intel-lgci-fdo-gitlab-mirror/drm.i915.kernel"
+to-branch = "drm-intel-next-fixes"
+
+[mirror.drm-i915-kernel-drm-intel-gt-next]
+from-repo = "https://gitlab.freedesktop.org/drm/i915/kernel"
+from-branch = "drm-intel-gt-next"
+to-repo = "https://github.com/intel-lgci-fdo-gitlab-mirror/drm.i915.kernel"
+to-branch = "drm-intel-gt-next"
+
+[mirror.drm-i915-kernel-for-linux-next]
+from-repo = "https://gitlab.freedesktop.org/drm/i915/kernel"
+from-branch = "for-linux-next"
+to-repo = "https://github.com/intel-lgci-fdo-gitlab-mirror/drm.i915.kernel"
+to-branch = "for-linux-next"
+
+[mirror.drm-i915-kernel-for-linux-next-fixes]
+from-repo = "https://gitlab.freedesktop.org/drm/i915/kernel"
+from-branch = "for-linux-next-fixes"
+to-repo = "https://github.com/intel-lgci-fdo-gitlab-mirror/drm.i915.kernel"
+to-branch = "for-linux-next-fixes"
+
+[mirror.drm-i915-kernel-for-linux-next-gt]
+from-repo = "https://gitlab.freedesktop.org/drm/i915/kernel"
+from-branch = "for-linux-next-gt"
+to-repo = "https://github.com/intel-lgci-fdo-gitlab-mirror/drm.i915.kernel"
+to-branch = "for-linux-next-gt"
+
+
+# Mesa
+
+[mirror.mesa-mesa]
+from-repo = "https://gitlab.freedesktop.org/mesa/mesa"
+from-branch = "main"
+to-repo = "https://github.com/intel-lgci-fdo-gitlab-mirror/mesa.mesa"
+to-branch = "main"
+
+[mirror.mesa-drm]
+from-repo = "https://gitlab.freedesktop.org/mesa/drm"
+from-branch = "main"
+to-repo = "https://github.com/intel-lgci-fdo-gitlab-mirror/mesa.drm"
+to-branch = "main"
+
+[mirror.mesa-piglit]
+from-repo = "https://gitlab.freedesktop.org/mesa/piglit"
+from-branch = "main"
+to-repo = "https://github.com/intel-lgci-fdo-gitlab-mirror/mesa.piglit"
+to-branch = "main"
+
+[mirror.mesa-crucible]
+from-repo = "https://gitlab.freedesktop.org/mesa/crucible"
+from-branch = "main"
+to-repo = "https://github.com/intel-lgci-fdo-gitlab-mirror/mesa.crucible"
+to-branch = "main"
