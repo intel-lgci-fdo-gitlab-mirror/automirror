@@ -91,6 +91,9 @@ def sync_repos(job: MirrorJob, repo_dir: str):
     git_cmd = ("git", "-C", repo_dir)
     xtras = {"check": True, "stderr": STDOUT}
 
+    # Configure pack.threads for faster kernel checkouts
+    run([*git_cmd, "config", "pack.threads", "0"], timeout=30, **xtras)
+
     # Set up and download missing objects from the source server:
     logging.info("Downloading the source branch from %s -> %s...", job.from_repo, job.from_branch)
     run([*git_cmd, "remote", "add", job.name, job.from_repo], timeout=30, **xtras)
