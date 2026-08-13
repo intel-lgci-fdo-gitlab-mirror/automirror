@@ -33,6 +33,42 @@ to-repo = "https://github.com/intel-lgci-fdo-gitlab-mirror/drm.tip"
 to-branch = "drm-tip"
 
 
+# Mainline
+
+[mirror.drm-next]
+from-repo = "https://gitlab.freedesktop.org/drm/kernel"
+from-branch = "drm-next"
+to-repo = "https://github.com/intel-lgci-fdo-gitlab-mirror/drm.kernel"
+to-branch = "drm-next"
+
+[mirror.drm-fixes]
+from-repo = "https://gitlab.freedesktop.org/drm/kernel"
+from-branch = "drm-fixes"
+to-repo = "https://github.com/intel-lgci-fdo-gitlab-mirror/drm.kernel"
+to-branch = "drm-fixes"
+
+
+# Misc
+
+[mirror.drm-misc-next]
+from-repo = "https://gitlab.freedesktop.org/drm/misc/kernel"
+from-branch = "drm-misc-next"
+to-repo = "https://github.com/intel-lgci-fdo-gitlab-mirror/drm.misc.kernel"
+to-branch = "drm-misc-next"
+
+[mirror.drm-misc-fixes]
+from-repo = "https://gitlab.freedesktop.org/drm/misc/kernel"
+from-branch = "drm-misc-fixes"
+to-repo = "https://github.com/intel-lgci-fdo-gitlab-mirror/drm.misc.kernel"
+to-branch = "drm-misc-fixes"
+
+[mirror.drm-misc-next-fixes]
+from-repo = "https://gitlab.freedesktop.org/drm/misc/kernel"
+from-branch = "drm-misc-next-fixes"
+to-repo = "https://github.com/intel-lgci-fdo-gitlab-mirror/drm.misc.kernel"
+to-branch = "drm-misc-next-fixes"
+
+
 # Xe
 
 [mirror.drm-xe-ci]
@@ -41,11 +77,23 @@ from-branch = "main"
 to-repo = "https://github.com/intel-lgci-fdo-gitlab-mirror/drm.xe.ci"
 to-branch = "main"
 
-[mirror.drm-xe-kernel]
+[mirror.drm-xe-next]
 from-repo = "https://gitlab.freedesktop.org/drm/xe/kernel"
 from-branch = "drm-xe-next"
 to-repo = "https://github.com/intel-lgci-fdo-gitlab-mirror/drm.xe.kernel"
 to-branch = "drm-xe-next"
+
+[mirror.drm-xe-fixes]
+from-repo = "https://gitlab.freedesktop.org/drm/xe/kernel"
+from-branch = "drm-xe-fixes"
+to-repo = "https://github.com/intel-lgci-fdo-gitlab-mirror/drm.xe.kernel"
+to-branch = "drm-xe-fixes"
+
+[mirror.drm-xe-next-fixes]
+from-repo = "https://gitlab.freedesktop.org/drm/xe/kernel"
+from-branch = "drm-xe-next-fixes"
+to-repo = "https://github.com/intel-lgci-fdo-gitlab-mirror/drm.xe.kernel"
+to-branch = "drm-xe-next-fixes"
 
 
 # i915
