@@ -9,3 +9,6 @@ See [GitHub docs](https://docs.github.com/en/get-started/using-git/troubleshooti
 It is recommended to fork kernel repos between each other and within the same network
 to share as many Git objects as possible under the hood. This decreases the amount
 of data each push needs to process and lowers the storage costs for the forge.
+
+...but because GitHub Actions stop working after 60 days of manual activity, this
+file needs to be regularly updated with *something*, so today is: 2026-10-27
